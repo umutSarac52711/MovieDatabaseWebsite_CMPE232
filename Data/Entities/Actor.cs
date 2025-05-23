@@ -1,14 +1,14 @@
-﻿namespace BlazorApp1.Data.Entitites;
+﻿namespace MovieDatabaseWebsite_CMPE232.Data.Entities;
 
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class Director
+public class Actor
 {
     [Key]
-    [ForeignKey("Awardable")] // PK for Director and FK to Awardable
+    [ForeignKey("Awardable")] // PK for Actor and FK to Awardable
     public int Awardable_ID { get; set; }
 
     [Required]

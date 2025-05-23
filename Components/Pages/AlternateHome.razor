@@ -1,0 +1,336 @@
+﻿@page "/home2"
+@using MovieDatabaseWebsite_CMPE232.Data
+@using MovieDatabaseWebsite_CMPE232.Data.Entities
+@using Microsoft.EntityFrameworkCore
+@inject MovieDbContext _context
+@inject NavigationManager _navManager
+
+<PageTitle>MovieDB Home</PageTitle>
+
+@* Hero Section *@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineBase - Movie Database System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1a1a2e',
+                        secondary: '#16213e',
+                        accent: '#e94560',
+                        gold: '#ffd700',
+                        light: '#f7f7f7'
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #1a1a2e;
+            color: #f7f7f7;
+        }
+        .movie-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+        .rating-star {
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-secondary shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <svg class="h-8 w-8 text-accent" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4zM11.25 15.25L10 18l-1.25-2.75L6 14l2.75-1.25L10 10l1.25 2.75L14 14l-2.75 1.25zm5.69-3.31L16 14l-.94-2.06L13 11l2.06-.94L16 8l.94 2.06L19 11l-2.06.94z"/>
+                        </svg>
+                        <span class="ml-2 text-xl font-bold text-white">CineBase</span>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:space-x-8">
+                        <a href="#" class="text-white hover:text-accent px-3 py-2 rounded-md text-sm font-medium border-b-2 border-accent">Movies</a>
+                        <a href="#" class="text-gray-300 hover:text-accent px-3 py-2 rounded-md text-sm font-medium">Actors</a>
+                        <a href="#" class="text-gray-300 hover:text-accent px-3 py-2 rounded-md text-sm font-medium">Directors</a>
+                        <a href="#" class="text-gray-300 hover:text-accent px-3 py-2 rounded-md text-sm font-medium">Awards</a>
+                        <a href="#" class="text-gray-300 hover:text-accent px-3 py-2 rounded-md text-sm font-medium">Studios</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="relative">
+                            <input type="text" placeholder="Search movies, actors..." class="bg-primary text-white rounded-full py-2 pl-4 pr-10 focus:outline-none focus:ring-2 focus:ring-accent">
+                            <button class="absolute right-0 top-0 mt-2 mr-3">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button class="bg-accent hover:bg-opacity-80 text-white px-4 py-2 rounded-md text-sm font-medium">Sign In</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div class="md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#" class="text-white block px-3 py-2 rounded-md text-base font-medium bg-accent bg-opacity-25">Movies</a>
+                <a href="#" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Actors</a>
+                <a href="#" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Directors</a>
+                <a href="#" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Awards</a>
+                <a href="#" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Studios</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content Area -->
+    <div id="movies-page" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Featured Movie Banner -->
+        <div class="relative rounded-xl overflow-hidden mb-8 h-96 bg-gradient-to-r from-secondary to-primary">
+            <div class="absolute inset-0 bg-black opacity-50"></div>
+            <div class="absolute inset-0 flex items-center">
+                <div class="px-8 md:px-16 w-full md:w-1/2">
+                    <span class="inline-block bg-accent text-white text-xs px-2 py-1 rounded-md mb-4">Featured</span>
+                    <h1 class="text-4xl font-bold text-white mb-2">Inception</h1>
+                    <div class="flex items-center mb-4">
+                        <div class="flex">
+                            <svg class="w-5 h-5 rating-star" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            <svg class="w-5 h-5 rating-star" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            <svg class="w-5 h-5 rating-star" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            <svg class="w-5 h-5 rating-star" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            <span class="ml-2 text-white">8.8/10</span>
+                        </div>
+                        <span class="mx-2 text-gray-300">|</span>
+                        <span class="text-gray-300">2010</span>
+                        <span class="mx-2 text-gray-300">|</span>
+                        <span class="text-gray-300">148 min</span>
+                    </div>
+                    <p class="text-gray-300 mb-6">A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.</p>
+                    <div class="flex space-x-4">
+                        <button class="bg-accent hover:bg-opacity-80 text-white px-6 py-2 rounded-md flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Watch Trailer
+                        </button>
+                        <button class="bg-transparent border border-white text-white px-6 py-2 rounded-md hover:bg-white hover:bg-opacity-10">
+                            More Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Movie Categories -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white">Popular Movies</h2>
+                <div class="flex space-x-2">
+                    <button class="p-2 rounded-full bg-secondary hover:bg-accent">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button class="p-2 rounded-full bg-secondary hover:bg-accent">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Movie Card 1 -->
+                <div class="movie-card bg-secondary rounded-lg overflow-hidden shadow-lg cursor-pointer">
+                    <div class="relative">
+                        <div class="h-64 bg-gray-700 flex items-center justify-center">
+                            <svg class="w-16 h-16 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h18M3 16h18"></path>
+                            </svg>
+                        </div>
+                        <div class="absolute top-2 right-2 bg-accent text-white text-xs px-2 py-1 rounded-md">
+                            8.5
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-white mb-1">The Dark Knight</h3>
+                        <div class="flex items-center text-sm text-gray-400 mb-2">
+                            <span>2008</span>
+                            <span class="mx-2">|</span>
+                            <span>Action, Crime</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <span class="text-gray-400">Dir: Christopher Nolan</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Movie Card 2 -->
+                <div class="movie-card bg-secondary rounded-lg overflow-hidden shadow-lg">
+                    <div class="relative">
+                        <div class="h-64 bg-gray-700 flex items-center justify-center">
+                            <svg class="w-16 h-16 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h18M3 16h18"></path>
+                            </svg>
+                        </div>
+                        <div class="absolute top-2 right-2 bg-accent text-white text-xs px-2 py-1 rounded-md">
+                            9.2
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-white mb-1">The Shawshank Redemption</h3>
+                        <div class="flex items-center text-sm text-gray-400 mb-2">
+                            <span>1994</span>
+                            <span class="mx-2">|</span>
+                            <span>Drama</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <span class="text-gray-400">Dir: Frank Darabont</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Movie Card 3 -->
+                <div class="movie-card bg-secondary rounded-lg overflow-hidden shadow-lg">
+                    <div class="relative">
+                        <div class="h-64 bg-gray-700 flex items-center justify-center">
+                            <svg class="w-16 h-16 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h18M3 16h18"></path>
+                            </svg>
+                        </div>
+                        <div class="absolute top-2 right-2 bg-accent text-white text-xs px-2 py-1 rounded-md">
+                            8.9
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-white mb-1">Pulp Fiction</h3>
+                        <div class="flex items-center text-sm text-gray-400 mb-2">
+                            <span>1994</span>
+                            <span class="mx-2">|</span>
+                            <span>Crime, Drama</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <span class="text-gray-400">Dir: Quentin Tarantino</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Movie Card 4 -->
+                <div class="movie-card bg-secondary rounded-lg overflow-hidden shadow-lg">
+                    <div class="relative">
+                        <div class="h-64 bg-gray-700 flex items-center justify-center">
+                            <svg class="w-16 h-16 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h18M3 16h18"></path>
+                            </svg>
+                        </div>
+                        <div class="absolute top-2 right-2 bg-accent text-white text-xs px-2 py-1 rounded-md">
+                            8.7
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-white mb-1">The Godfather</h3>
+                        <div class="flex items-center text-sm text-gray-400 mb-2">
+                            <span>1972</span>
+                            <span class="mx-2">|</span>
+                            <span>Crime, Drama</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <span class="text-gray-400">Dir: Francis Ford Coppola</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Award-Winning Movies -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white">Award-Winning Movies</h2>
+                <a href="#" class="text-accent hover:underline">View All</a>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Award Movie Card 1 -->
+                <div class="movie-card bg-secondary rounded-lg overflow-hidden shadow-lg">
+                    <div class="relative">
+                        <div class="h-64 bg-gray-700 flex items-center justify-center">
+                            <svg class="w-16 h-16 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h18M3 16h18"></path>
+                            </svg>
+                        </div>
+                        <div class="absolute top-2 right-2 bg-gold text-primary text-xs px-2 py-1 rounded-md font-bold">
+                            Oscar
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-white mb-1">Parasite</h3>
+                        <div class="flex items-center text-sm text-gray-400 mb-2">
+                            <span>2019</span>
+                            <span class="mx-2">|</span>
+                            <span>Drama, Thriller</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <span class="text-gray-400">Best Picture 2020</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Award Movie Card 2 -->
+                <div class="movie-card bg-secondary rounded-lg overflow-hidden shadow-lg">
+                    <div class="relative">
+                        <div class="h-64 bg-gray-700 flex items-center justify-center">
+                            <svg class="w-16 h-16 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h18M3 16h18"></path>
+                            </svg>
+                        </div>
+                        <div class="absolute top-2 right-2 bg-gold text-primary text-xs px-2 py-1 rounded-md font-bold">
+                            Golden Globe
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-white mb-1">Nomadland</h3>
+                        <div class="flex items-center text-sm text-gray-400 mb-2">
+                            <span>2020</span>
+                            <span class="mx-2">|</span>
+                            <span>Drama</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <span class="text-gray-400">Best Drama 2021</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'942e930f3224c66e',t:'MTc0Nzc3Mjg0My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

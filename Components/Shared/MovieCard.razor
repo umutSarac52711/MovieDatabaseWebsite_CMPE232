@@ -1,0 +1,36 @@
+﻿@using MovieDatabaseWebsite_CMPE232.Data.Entities
+@* Could be in /Shared/MovieCard.razor or /Components/MovieCard.razor *@
+
+@if (Movie != null)
+{
+    <div class="movie-card" @onclick="() => OnMovieClicked.InvokeAsync(Movie.Awardable_ID)">
+        <div class="movie-poster-container">
+            @if (!string.IsNullOrWhiteSpace(Movie.PosterUrl)) // Assuming Movie has a PosterUrl property
+            {
+                <img src="@Movie.PosterUrl" alt="@Movie.Title Poster" class="movie-poster" />
+            }
+            else
+            {
+                <div class="poster-placeholder">
+                    <span>@Movie.Title</span>
+                </div>
+            }
+        </div>
+        <div class="movie-card-content">
+            <h5 class="movie-card-title">@Movie.Title</h5>
+            <p class="movie-card-info">@Movie.Release_Date.Year</p>
+            @if(Movie.Rating.HasValue)
+            {
+                <p class="movie-card-rating">Rating: @Movie.Rating.Value.ToString("0.0") / 10</p>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public Movie Movie { get; set; }
+    [Parameter] public EventCallback<int> OnMovieClicked { get; set; }
+
+    // You would add a PosterUrl string property to your Movie entity model
+    // Example: public string PosterUrl { get; set; }
+}

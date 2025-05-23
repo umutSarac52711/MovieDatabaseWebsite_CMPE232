@@ -1,7 +1,239 @@
 ﻿@page "/"
+@using MovieDatabaseWebsite_CMPE232.Data
+@using MovieDatabaseWebsite_CMPE232.Data.Entities
+@using Microsoft.EntityFrameworkCore
+@using MovieDatabaseWebsite_CMPE232.Components.Shared
+@inject MovieDbContext _context
+@inject NavigationManager _navManager
 
-<PageTitle>Home</PageTitle>
+<PageTitle>MovieDB Home</PageTitle>
 
-<h1>Hello, world!</h1>
+@* Hero Section *@
+<section class="hero-section text-center py-5">
+    <div class="container">
+        <h1 class="display-4 hero-title">Welcome to MovieDB</h1>
+        <p class="lead hero-subtitle">Your ultimate destination for movie information, reviews, and more.</p>
+        @* You could add a prominent search bar here or a call to action button *@
+        @* <div class="mt-4">
+            <input type="text" class="form-control form-control-lg w-50 mx-auto" placeholder="Search for movies, actors, directors..." @bind="globalSearchTerm" @onkeyup="HandleGlobalSearchKeyUp" />
+        </div> *@
+    </div>
+</section>
 
-Welcome to your new app.
+<div class="container mt-5 page-content">
+
+    @* Featured Movies Section *@
+    <section class="mb-5">
+        <h2 class="section-title">Featured Movies</h2>
+        @if (isLoadingFeatured)
+        {
+            <LoadingIndicator />
+        }
+        else if (featuredMovies != null && featuredMovies.Any())
+        {
+            <div class="movie-grid">
+                @foreach (var movie in featuredMovies)
+                {
+                    <MovieCard Movie="movie" OnMovieClicked="NavigateToMovieDetails" />
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">No featured movies available at the moment.</p>
+        }
+    </section>
+
+    @* Recently Added Movies Section *@
+    <section class="mb-5">
+        <h2 class="section-title">Recently Added</h2>
+        @if (isLoadingRecent)
+        {
+            <LoadingIndicator />
+        }
+        else if (recentMovies != null && recentMovies.Any())
+        {
+            <div class="movie-grid">
+                @foreach (var movie in recentMovies)
+                {
+                    <MovieCard Movie="movie" OnMovieClicked="NavigateToMovieDetails" />
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">No recently added movies found.</p>
+        }
+    </section>
+
+    @* Top Rated Movies Section *@
+    <section class="mb-5">
+        <h2 class="section-title">Top Rated</h2>
+        @if (isLoadingTopRated)
+        {
+            <LoadingIndicator />
+        }
+        else if (topRatedMovies != null && topRatedMovies.Any())
+        {
+            <div class="movie-grid">
+                @foreach (var movie in topRatedMovies)
+                {
+                    <MovieCard Movie="movie" OnMovieClicked="NavigateToMovieDetails" />
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">No top rated movies found.</p>
+        }
+    </section>
+
+    @* Browse by Genre Section *@
+    <section class="mb-5">
+        <h2 class="section-title">Browse by Genre</h2>
+        @if (isLoadingGenres)
+        {
+            <LoadingIndicator />
+        }
+        else if (genres != null && genres.Any())
+        {
+            <div class="genre-tags">
+                @foreach (var genre in genres)
+                {
+                    <span class="genre-tag" @onclick="() => NavigateToGenre(genre)">@genre</span>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">No genres available.</p>
+        }
+    </section>
+
+</div>
+
+@code {
+    private List<Movie> featuredMovies;
+    private List<Movie> recentMovies;
+    private List<Movie> topRatedMovies;
+    private List<string> genres;
+
+    private bool isLoadingFeatured = true;
+    private bool isLoadingRecent = true;
+    private bool isLoadingTopRated = true;
+    private bool isLoadingGenres = true;
+
+    // private string globalSearchTerm; // For a global search bar
+
+    protected override async Task OnInitializedAsync()
+    {
+        var featuredTask = LoadFeaturedMovies();
+        var recentTask = LoadRecentMovies();
+        var topRatedTask = LoadTopRatedMovies();
+        var genresTask = LoadGenres();
+
+        await Task.WhenAll(featuredTask, recentTask, topRatedTask, genresTask);
+    }
+
+    private async Task LoadFeaturedMovies()
+    {
+        isLoadingFeatured = true;
+        try
+        {
+            // Logic for "featured" can vary: hand-picked, highly rated with recent release, etc.
+            // For this example, let's take top 5 rated movies released in the last 5 years.
+            var fiveYearsAgo = DateTime.Today.AddYears(-5);
+            featuredMovies = await _context.Movies
+                                    .Where(m => m.Release_Date >= fiveYearsAgo)
+                                    .OrderByDescending(m => m.Rating)
+                                    .ThenByDescending(m => m.Revenue) // Secondary sort
+                                    .Take(4) // Show 4 in a row for example
+                                    .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            // Log error
+            Console.WriteLine($"Error loading featured movies: {ex.Message}");
+            featuredMovies = new List<Movie>(); // Ensure it's not null
+        }
+        isLoadingFeatured = false;
+    }
+
+    private async Task LoadRecentMovies()
+    {
+        isLoadingRecent = true;
+        try
+        {
+            recentMovies = await _context.Movies
+                                .OrderByDescending(m => m.Release_Date) // Or an "AddedDate" if you have one
+                                .Take(4)
+                                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading recent movies: {ex.Message}");
+            recentMovies = new List<Movie>();
+        }
+        isLoadingRecent = false;
+    }
+
+    private async Task LoadTopRatedMovies()
+    {
+        isLoadingTopRated = true;
+        try
+        {
+            topRatedMovies = await _context.Movies
+                                .Where(m => m.Rating != null) // Ensure rating exists
+                                .OrderByDescending(m => m.Rating)
+                                .Take(4)
+                                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading top rated movies: {ex.Message}");
+            topRatedMovies = new List<Movie>();
+        }
+        isLoadingTopRated = false;
+    }
+
+    private async Task LoadGenres()
+    {
+        isLoadingGenres = true;
+        try
+        {
+            // Assumes MovieGenre table and a simple string for Genre
+            genres = await _context.MovieGenres
+                            .Select(mg => mg.Genre)
+                            .Distinct()
+                            .OrderBy(g => g)
+                            .Take(10) // Limit for display on homepage
+                            .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading genres: {ex.Message}");
+            genres = new List<string>();
+        }
+        isLoadingGenres = false;
+    }
+
+    private void NavigateToMovieDetails(int movieId)
+    {
+        _navManager.NavigateTo($"/movies/{movieId}");
+    }
+
+    private void NavigateToGenre(string genreName)
+    {
+        // Navigate to a movies list page, pre-filtered by this genre
+        _navManager.NavigateTo($"/movies?genre={Uri.EscapeDataString(genreName)}");
+    }
+
+    // Example for a global search bar
+    // private void HandleGlobalSearchKeyUp(KeyboardEventArgs e)
+    // {
+    //     if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(globalSearchTerm))
+    //     {
+    //         _navManager.NavigateTo($"/search?query={Uri.EscapeDataString(globalSearchTerm)}");
+    //     }
+    // }
+}

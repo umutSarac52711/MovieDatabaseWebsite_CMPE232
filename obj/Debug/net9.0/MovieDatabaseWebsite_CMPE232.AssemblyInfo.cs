@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MovieDatabaseWebsite_CMPE232")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7e4bed93e001f1a5c3d706b4b4e7c695856e5ed0")]
 [assembly: System.Reflection.AssemblyProductAttribute("MovieDatabaseWebsite_CMPE232")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MovieDatabaseWebsite_CMPE232")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

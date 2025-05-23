@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BlazorApp1.Data.Entitites;
+namespace MovieDatabaseWebsite_CMPE232.Data.Entities;
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

@@ -1,4 +1,4 @@
-﻿using BlazorApp1.Data.Entitites;
+﻿using MovieDatabaseWebsite_CMPE232.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace MovieDatabaseWebsite_CMPE232.Data;
