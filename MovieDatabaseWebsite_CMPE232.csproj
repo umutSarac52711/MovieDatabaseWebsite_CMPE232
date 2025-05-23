@@ -19,4 +19,10 @@
       </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Pages\Directors\DirectorDetails.razor" />
+      <AdditionalFiles Include="Components\Pages\Directors\DirectorForm.razor" />
+      <AdditionalFiles Include="Components\Pages\Directors\DirectorList.razor" />
+    </ItemGroup>
+
 </Project>

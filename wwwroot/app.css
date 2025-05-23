@@ -58,3 +58,197 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* app.css or a specific stylesheet */
+
+/* Basic Theme Colors (CSS Variables for easy changes) */
+:root {
+    --bg-primary: #1A1A1A;
+    --bg-secondary: #2C2C2C;
+    --text-primary: #EAEAEA;
+    --text-secondary: #B0B0B0;
+    --accent-primary: #F7B500; /* Gold/Yellow */
+    --accent-secondary: #A0A0A0; /* Muted Silver */
+    --card-border-color: #444;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Or a more cinematic font */
+}
+
+a {
+    color: var(--accent-primary);
+    text-decoration: none;
+}
+a:hover {
+    color: #FFD700; /* Lighter gold on hover */
+    text-decoration: underline;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), url('/images/hero-background.jpg'); /* Add a nice background image */
+    background-size: cover;
+    background-position: center;
+    color: white; /* Override default text for hero */
+}
+.hero-title {
+    font-weight: bold;
+    color: #FFF; /* Ensure high contrast */
+}
+.hero-subtitle {
+    color: #DDD;
+}
+
+/* General Page Content */
+.page-content {
+    padding-bottom: 3rem;
+}
+
+.section-title {
+    color: var(--accent-primary);
+    border-bottom: 2px solid var(--accent-primary);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 300;
+    letter-spacing: 1px;
+}
+
+/* Movie Grid */
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Responsive grid */
+    gap: 1.5rem;
+}
+
+/* Movie Card (from MovieCard.razor) */
+.movie-card {
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.movie-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(var(--accent-primary-rgb, 247, 181, 0), 0.2); /* Soft glow with accent */
+}
+
+.movie-poster-container {
+    width: 100%;
+    padding-top: 150%; /* Aspect ratio 2:3 for posters */
+    position: relative;
+    background-color: #333; /* Placeholder bg if image fails */
+}
+
+.movie-poster {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Cover ensures the image fills the container */
+}
+
+.poster-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    background-color: #383838;
+}
+.poster-placeholder span {
+    max-height: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.movie-card-content {
+    padding: 0.8rem 1rem;
+    flex-grow: 1; /* Allows content to fill space if card heights vary slightly */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.movie-card-title {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.movie-card-info,
+.movie-card-rating {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.2rem;
+}
+
+.movie-card-rating {
+    font-weight: bold;
+    color: var(--accent-primary); /* Highlight rating */
+}
+
+/* Genre Tags */
+.genre-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.genre-tag {
+    background-color: var(--bg-secondary);
+    color: var(--accent-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    border: 1px solid var(--accent-primary);
+}
+
+.genre-tag:hover {
+    background-color: var(--accent-primary);
+    color: var(--bg-primary); /* Invert colors on hover */
+}
+
+/* Loading Indicator */
+.loading-indicator {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
+/* Utility for button like MovieCard */
+.btn-accent {
+    background-color: var(--accent-primary);
+    color: var(--bg-primary); /* Dark text on gold button */
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+.btn-accent:hover {
+    background-color: #FFD700; /* Lighter gold on hover */
+    color: var(--bg-primary);
+}

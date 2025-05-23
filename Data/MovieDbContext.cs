@@ -48,7 +48,7 @@ public class MovieDbContext : DbContext
             .HasOne(mg => mg.Movie)
             .WithMany(m => m.MovieGenres)
             .HasForeignKey(mg => mg.Movie_ID)
-            .HasPrincipalKey(m => m.Awardable_ID); // Specify principal key if not default 'Id'
+            .HasPrincipalKey(m => m.Awardable_ID); // Specify principal key if not default 'ID'
 
         // Composite Key for MovieCompany
         modelBuilder.Entity<MovieCompany>()
